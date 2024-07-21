@@ -1,7 +1,8 @@
 import { useState } from "react"
 
+
 function AddUser({onAdd,onCancel}) {
-    const [user,setUser] = useState({})
+    const [user,setUser] = useState({name:"",id:"",email:"",address:{city:"",street:"",zipcode:""} ,todos:[],posts:[]})
 
     const style = {
         background:"grey",

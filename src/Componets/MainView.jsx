@@ -1,4 +1,4 @@
-
+import { v4 as uuid } from 'uuid';
 import { useState } from 'react'
 import UserView from "./UserView"
 import TodosView from "./TodosView"
@@ -18,9 +18,7 @@ function MainView() {
     const [search,setSearch] = useState("")
     const [currentUser,setCurrentUser] = useState({})
     const [sideNavMod,setSideNavMod] = useState(sideNav.empty)
-
-
-
+    
     const mainStyle = {
       background:"green",
       width: 500,
@@ -39,7 +37,10 @@ function MainView() {
 
     const onAddUser = (data) =>{
       setSideNavMod(sideNav.detail)
-
+      const id = uuid().substring(0,5)
+      data["id"] = id
+      users[id] = data
+      setUsers(users)
     }
 
     const onCancel = () =>{
@@ -48,28 +49,52 @@ function MainView() {
 
 
     const onUpdate = (id,data) =>{
-
+      if (id in users){
+        users[id].address = {...data.address}
+        users[id].name = data.name
+        users[id].id = data.id
+        users[id].email = data.email 
+        setUsers({...users})
+      }
     }
 
     const onDelete = id =>{
-
+      if (id in users){
+        delete users[id]
+        setUsers({...users})
+      }
+    }
+    
+    const onTodoComplite = (userId,id) =>{
+      if(userId in users){
+        const user = users[userId]
+        for(let item of user.todos){
+            if(item.id === id){
+              item.complite = true
+            }
+        } 
+        console.log("")
+        setCurrentUser({...user})
+        users[userId] = user
+        setUsers(users)
+        setSideNavMod(sideNav.detail)
+      }
     }
 
-    const OnAdd = data =>{
-
+    const onAddPost = (id,data) =>{
+      if (id in users){
+        data["id"] = uuid().substring(0,5)
+        users[id].posts.push(data)
+        setUsers({...users})
+      }
     }
-
-    const onTodoComplite = (id) =>{
-
-    }
-
-    const onAddPost= (id,data) =>{
-
-    }
-
-
-    const  OnAddTodo = (data) =>{
-
+    
+    const  OnAddTodo = (id, data) =>{
+      if (id in users){
+        data["id"] = uuid().substring(0,5)
+        users[id].todos.push(data)
+        setUsers({...users})
+      }   
     }
 
     const onClickListItem = (id,event) =>{
@@ -89,9 +114,7 @@ function MainView() {
       }
     }
     }
-
-
-
+    
     const renderSwitch =(param) => {
       switch(param) {
         case sideNav.empty:
@@ -129,9 +152,7 @@ function MainView() {
                          </li>
                     }
                   }
-
-
-                })
+              })
             }
 
         </ol>
