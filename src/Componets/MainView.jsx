@@ -4,31 +4,68 @@ import UserView from "./UserView"
 import TodosView from "./TodosView"
 import PortsView from "./PortsView"
 import AddUser from "./AddUser"
-
+import { useEffect } from 'react';
+import axios from 'axios';
 const sideNav = {
   newuser: 'newUser',
   empty: 'empty',
   detail: 'detail',
 };
 
-function MainView() {
-  // const [userslist,setUserslist] = useState([{name:"putin",id:"1",email:"xxx@xxx",address:{city:"moskva",street:"putina",zipcode:"1111222"} ,todos:[{id:1,title:"xxxx",complite:false}],posts:[{id:1,title:"xxxx",body:{text:"someting"}}]}])
+const URl_users = "https://jsonplaceholder.typicode.com/users"
+const URl_TODOS = "https://jsonplaceholder.typicode.com/todos"
+const URl_POSTS = "https://jsonplaceholder.typicode.com/posts"
 
-    const [users,setUsers] = useState({"1":{name:"putin",id:"1",email:"xxx@xxx",address:{city:"moskva",street:"putina",zipcode:"1111222"} ,todos:[{id:1,title:"xxxx",complite:false}],posts:[{id:1,title:"xxxx",body:{text:"someting"}}]}})
-    const [search,setSearch] = useState("")
-    const [currentUser,setCurrentUser] = useState({})
-    const [sideNavMod,setSideNavMod] = useState(sideNav.empty)
-    
+
+function MainView() {
+
+  const [users,setUsers] = useState({})
+  const [search,setSearch] = useState("")
+  const [currentUser,setCurrentUser] = useState({})
+  const [sideNavMod,setSideNavMod] = useState(sideNav.empty)
+
+    useEffect(()=>{
+      const fetchData = async () =>{
+        const {data:usersData} = await axios.get(URl_users)
+        const {data:todosData} = await axios.get(URl_TODOS)
+        const {data:postsData} = await axios.get(URl_POSTS)
+        const data = {}
+
+        for ( let item of usersData){
+          data[item.id] = item
+          data[item.id]["posts"] = []
+          data[item.id]["todos"] = []
+        }
+
+        for(let item of todosData){
+          if(item.userId in data){
+            data[item.userId]["todos"].push(item)
+          }
+        }
+        
+        for(let item of postsData){
+          if(item.userId in data){
+            data[item.userId]["posts"].push(item)
+          }
+          
+        }
+        setUsers(data)
+      }
+      fetchData()
+    },[])
+
     const mainStyle = {
       background:"green",
       width: 500,
-      hight: 500
+      hight: 500,
+      border: '5px solid black',
       }
 
       const sideStyle = {
         background:"pink",
         width: 500,
-        hight: 500
+        hight: 500,
+        border: '5px solid back',
       }
     
     const onClickAddNewUser = () =>{
@@ -50,10 +87,12 @@ function MainView() {
 
     const onUpdate = (id,data) =>{
       if (id in users){
+        
         users[id].address = {...data.address}
         users[id].name = data.name
         users[id].id = data.id
-        users[id].email = data.email 
+        users[id].email = data.email
+
         setUsers({...users})
       }
     }
@@ -73,7 +112,6 @@ function MainView() {
               item.complite = true
             }
         } 
-        console.log("")
         setCurrentUser({...user})
         users[userId] = user
         setUsers(users)
@@ -96,21 +134,23 @@ function MainView() {
         setUsers({...users})
       }   
     }
-
+    const [previuseEvent,setPreviuseEvent] = useState(undefined)  
     const onClickListItem = (id,event) =>{
 
       if(event.target.tagName==="DIV"){
-        
-      console.log(JSON.stringify(users[id]))
       if(id === currentUser.id && event.target.style.background === "orange"){
         event.target.style.background = "blue"
         setSideNavMod(sideNav.empty)
         setCurrentUser({})
        return;
       }else{
+        if(previuseEvent){
+          previuseEvent.target.style.background = "blue"
+        }
         event.target.style.background = "orange"
         setSideNavMod(sideNav.detail)
         setCurrentUser(users[id])
+        setPreviuseEvent(event) 
       }
     }
     }
@@ -133,7 +173,7 @@ function MainView() {
     }
 
     return (
-      <div style={{display: 'flex'}}>
+      <div style={{display: 'flex', border: '2px solid red',}}>
        <div style={mainStyle}>
         Sreach : <input type = "text"  onChange={e => {setSearch(e.target.value)}}/> <br />
         <button onClick={e =>{onClickAddNewUser()}}>Add</button>

@@ -5,7 +5,10 @@ function UserView({id, name, email, address, onUpdate, onDelete, onClick}) {
     const [user,setUser] = useState({})
     const [userAddress,setUserAddress] = useState({})
     const style ={
-      background :"blue"
+      background :"blue",
+      hight:200,
+      border: '1px solid black',
+      flex:1
     }
     
     const handleOnClick =(e) =>{
@@ -14,12 +17,12 @@ function UserView({id, name, email, address, onUpdate, onDelete, onClick}) {
 
     return (
       <div onClick={handleOnClick} style={style}>
-        ID: <input onChange={e => setUser({...user, id:e.target.value})} defaultValue={id} type="text"/> 
+        ID: <input onChange={e => setUser({...user, id:e.target.value})} defaultValue={id} type="text"/> <br />
         Name: <input onChange={e => setUser({...user, name:e.target.value})} defaultValue={name} type="text"/> 
-        Email:<input  onChange={e => setUser({...user, email:e.target.value})} defaultValue={email} type="text"/> 
+        Email:<input  onChange={e => setUser({...user, email:e.target.value})} defaultValue={email} type="text"/> <br /> 
 
-        <button onMouseEnter={e => setIsShowOtherData(!isShowOtherData)}> other data </button> <br />
-        <button onClick={e => onUpdate(id,{user:user, address:userAddress})}> update </button> <br />
+        <label onMouseEnter={e => setIsShowOtherData(!isShowOtherData)}> other data </label> <br />
+        <button onClick={e => onUpdate(id,{user:user, address:userAddress})}> update </button> 
         <button onClick={e => onDelete(id)}> delete </button> <br />
 
         {
